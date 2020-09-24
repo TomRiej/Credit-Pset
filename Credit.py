@@ -6,6 +6,16 @@ INVALID = -1
 # ========================= Validation Subroutines =======================
 
 def validateFormat(cardNum):
+    """checks a string of numbers separated by spaces if it is 16 numbers long
+       and if its made up of single digits of integers
+
+    Args:
+        cardNum (String): numbers separated by 
+
+    Returns:
+        [int]: formated to be used by other subroutines
+        (boolean): True if valid, False if not
+    """ 
     cardNum = cardNum.strip().split(" ")
     if len(cardNum) != 16:
         print("Card isn't 16 digits:", len(cardNum), "digits")
@@ -23,6 +33,14 @@ def validateFormat(cardNum):
     return cardNum, True
 
 def validateCardNumber(cardNum):
+    """checks if the card number is valid based on Luhn's algorithm
+
+    Args:
+        cardNum (List of int): Card number to be checked (in correct format already)
+
+    Returns:
+        Bool: returns True if valid based on Luhn's algorithm, False if not
+    """
 
     everySecondNum = []
     for i in range(0,len(cardNum)//2):  # 'unzips' the list
@@ -44,11 +62,15 @@ def validateCardNumber(cardNum):
         return False
 
 
-
-
 # ========================= Subroutines for the 3 options ================
 
 def checkCard():
+    """Called from the main subroutine
+        User input for card numbers
+        Input validation and then correct formatting
+        card Number validation using Luhn's algorithm
+        Prints appropriate message if valid or invalid
+    """
     cardNum = input("\nPlease enter your 16 digit card number separated by spaces:\n")
     cardNum, validFormat = validateFormat(cardNum)
     if validFormat:
@@ -56,7 +78,6 @@ def checkCard():
             print("The card Number is valid! ")
         else:
             print("the card Number is invalid...")
-
 
 
 def checkImportNum():
@@ -71,7 +92,7 @@ def menu():
     """Displays the menu for the user
 
     Returns:
-        [string]: valid user input
+        (int): valid user input
     """
     print("\n\nOptions:")
     print("1. Check my card")
@@ -91,6 +112,15 @@ def menu():
     return ans
 
 def main(ans):
+    """Main subroutine
+        calls subroutines according to users choice
+
+    Args:
+        ans (int): users choice, subrouting called accordingly
+
+    Returns:
+        (Bool): False to quit the main loop
+    """
     if ans == 1:
         checkCard()
     elif ans == 2:
