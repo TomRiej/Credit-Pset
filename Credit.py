@@ -19,6 +19,9 @@ def menu():
             valid = True
         else:
             print("invalid input: must be integer from 1-4\n")
+    return ans
+
+def main(ans):
     if ans == 1:
         checkCard()
     elif ans == 2:
@@ -29,16 +32,30 @@ def menu():
         print("Thank you\n")
 
 
-def validateCardNum(cardNum):
+def validateFormat(cardNum):
     cardNum = cardNum.strip().split(" ")
-    print(cardNum)
     if len(cardNum) != 16:
-        print("Card isn't 16 digits")
-    print("fini")
+        print("Card isn't 16 digits:", len(cardNum), "digits")
+        return False
+    for i in cardNum:
+        if len(i) > 1:
+            print("not all elements are single digit numbers (0-9)")
+            return False
+        try:
+            int(i)
+        except:
+            print("not all elements are numbers")
+            return False
+    cardNum = [int(i) for i in cardNum]
+    return cardNum, True
+
 
 def checkCard():
     cardNum = input("Please enter your 16 digit card number separated by spaces:\n")
-    validateCardNum(cardNum)
+    cardNum, validFormat = validateFormat(cardNum)
+    if validFormat:
+        pass
+
 
 
 
@@ -51,7 +68,10 @@ def generateCC():
     pass
 
 
-# menu()
+# Could just do: main(menu()) but for clarity:
+chosen = menu()
+main(chosen)
 
-testCardNum = "0 3 7 8 2 8 2 2 4 6 3 1 0 0 0 5"
-validateCardNum(testCardNum)
+
+# testCardNum = "0 3 7 8 2 8 2 2 4 6 3 1 0 0 0 5"
+# validateFormat(testCardNum)
