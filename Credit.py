@@ -16,14 +16,11 @@ def validateFormat(cardNum):
         [int]: formated to be used by other subroutines
         (boolean): True if valid, False if not
     """ 
-    cardNum = cardNum.strip().split(" ")
+    cardNum = list(cardNum.strip())
     if len(cardNum) != 16:
         print("Card isn't 16 digits:", len(cardNum), "digits")
         return None, False
     for i in cardNum:
-        if len(i) > 1:
-            print("not all elements are single digit numbers (0-9)")
-            return None, False
         try:
             int(i)
         except:
@@ -61,6 +58,13 @@ def validateCardNumber(cardNum):
     else:
         return False
 
+def validatePath(path):
+    try:
+        fileHandle = open(path,"r")
+    except:
+        return False
+    fileHandle.close()
+    return True
 
 # ========================= Subroutines for the 3 options ================
 
@@ -71,7 +75,7 @@ def checkCard():
         card Number validation using Luhn's algorithm
         Prints appropriate message if valid or invalid
     """
-    cardNum = input("\nPlease enter your 16 digit card number separated by spaces:\n")
+    cardNum = input("\nPlease enter your 16 digit card number in one go (16 digits, no spaces):\n")
     cardNum, validFormat = validateFormat(cardNum)
     if validFormat:
         if validateCardNumber(cardNum):
@@ -81,7 +85,32 @@ def checkCard():
 
 
 def checkImportNum():
-    pass
+    """Called from the main subroutine
+        User inputs the path to the file
+        inputted path is validated
+        file is opened and contents are traversed line by line
+        for each line:
+            format is validated
+            card number is validated using Luhn's algorithm
+            appropriate message printed
+    """
+    path = input("\ninput the relative path of the file:")
+    if validatePath(path):
+        with open(path,"r") as f:
+            for line in f:
+                cardNum, validFormat = validateFormat(line.strip())
+                if validFormat:
+                    if validateCardNumber(cardNum):
+                        print("The card Number: ", line.strip()," is valid! ")
+                    else:
+                        print("the card Number: ", line.strip()," is invalid...")
+        f.close()
+    else:
+        print("Invalid path")
+
+                        
+
+
 
 def generateCC():
     pass
@@ -139,11 +168,16 @@ def main(ans):
 
 go = True
 while go:
-    # Could just do: main(menu()) but for clarity:
+    # Could just do: go = main(menu()) but for clarity:
     chosen = menu()
     go = main(chosen)
 
 
-testCardNum = "0 3 7 8 2 8 2 2 4 6 3 1 0 0 0 5"
+# testCardNum = "0378282246310005"
 # num, boo = validateFormat(testCardNum)
-# validateCardNumber(num)
+# print(validateCardNumber(num))
+
+# checkImportNum()
+
+# Path specific to me:
+# /Users/Tom/Desktop/CS-A-Level/MWDCredit.txt
