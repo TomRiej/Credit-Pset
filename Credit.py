@@ -1,9 +1,12 @@
 # Tom Rietjens
 # Credit Pset
 
-INVALID = -1
+from random import randint
 
-# ========================= Validation Subroutines =======================
+CARD_LENGTH = 16
+
+
+# ================= Luhn's algoritm and Validation Subroutines ===========
 
 def validateFormat(cardNum):
     """checks a string of numbers separated by spaces if it is 16 numbers long
@@ -17,7 +20,7 @@ def validateFormat(cardNum):
         (boolean): True if valid, False if not
     """ 
     cardNum = list(cardNum.strip())
-    if len(cardNum) != 16:
+    if len(cardNum) != CARD_LENGTH:
         print("Card isn't 16 digits:", len(cardNum), "digits")
         return None, False
     for i in cardNum:
@@ -33,7 +36,7 @@ def validateCardNumber(cardNum):
     """checks if the card number is valid based on Luhn's algorithm
 
     Args:
-        cardNum (List of int): Card number to be checked (in correct format already)
+        cardNum [int]: Card number to be checked (in correct format already)
 
     Returns:
         Bool: returns True if valid based on Luhn's algorithm, False if not
@@ -48,7 +51,7 @@ def validateCardNumber(cardNum):
     for i in everySecondNum:
         ix2 = i*2
         if len(str(ix2)) > 1:
-            sumESN += int(str(ix2)[0]) + int(str(ix2)[1]) # if its a 2 digit number, it adds the two digits seperatly
+            sumESN += ix2 - 9 # if its a 2 digit number, it adds the sum of the two digits
         else:
             sumESN += ix2
     
@@ -65,6 +68,56 @@ def validatePath(path):
         return False
     fileHandle.close()
     return True
+
+def createValidCC():
+    # max : 9999999999999999 => (with luhn alg.) total of 144 ==> highest valid num total is 140
+    # min : 0000000000000000 => (with luhn alg.) total of 0  ==> lowest valid sum is 0 
+
+    # Creates every Second number, as these are the ones which undergo luhn alg
+    sumMaxSingle = 9*8
+    eSN = []
+    sumESN = 0
+    for i in range(0,CARD_LENGTH//2):
+        digit = randint(0,9)
+        eSN.append(digit)
+        res = digit*2
+        if len(str(res)) > 1:
+            sumESN += res - 9 
+        else:
+            sumESN += res
+        
+    # created a maximum and minimum valid total number (last digit is 0)
+    sumMax = int(str(sumESN + sumMaxSingle)[:-1]) # removes the last digit to make RNG*10 make a valid total (0 at end) 
+    sumMin = int(str(sumESN+10)[:-1])             
+    total = randint(sumMin,sumMax)*10
+    difference = total - sumESN
+
+    # the difference is then made up using random numbers
+    # these numbers become the other half of every second number to create a full card number
+    unalteredDigits = []
+    while len(unalteredDigits) < 8:
+        if difference > 0:
+            digit = randint(0,9)
+            if difference - digit >= 0:
+                unalteredDigits.append(digit)
+                difference -= digit
+        else:
+            unalteredDigits.append(0)
+    
+
+    # puts both halves of the card number together
+    validCardNum = []
+    for i in range(CARD_LENGTH//2):
+        validCardNum.append(eSN[i])
+        validCardNum.append(unalteredDigits[i])
+    return "".join([str(i) for i in validCardNum])
+    
+    
+
+
+
+    
+    
 
 # ========================= Subroutines for the 3 options ================
 
@@ -108,12 +161,26 @@ def checkImportNum():
     else:
         print("Invalid path")
 
-                        
-
 
 
 def generateCC():
-    pass
+    valid = False
+    while not valid:
+        try:
+            quantity = int(input("\nHow many card numbers do you want? 1-100 "))
+            if quantity in range(1,101):
+                valid = True
+            else:
+                print("Invid input: must be 1-100")
+        except:
+            print("Invalid input: must be a number from 1-100")
+
+    for i in range(0,quantity):
+        validCardNum = createValidCC()
+        #  Tests:
+        # tempCardNum, boo = validateFormat(validCardNum)
+        # print(validCardNum,"Format: ",boo,"Number:", validateCardNumber(tempCardNum))
+
 
 
 # ========================= Menu and main Program ========================
@@ -133,7 +200,7 @@ def menu():
         try:
             ans = int(input("enter the number you want to choose: "))
         except:
-            ans = INVALID
+            ans = False
         if ans in range(1,5):
             valid = True
         else:
@@ -157,8 +224,12 @@ def main(ans):
     elif ans == 3:
         generateCC()
     else:
-        print("Thank you\n")
-        return False
+        confirm = input("Are you sure you want to quit? 'n': ")
+        if confirm == "n":
+            return True
+        else:
+            print("Thank you\n")
+            return False
     return True
 
 
